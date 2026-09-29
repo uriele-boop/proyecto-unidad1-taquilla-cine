@@ -3,14 +3,75 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package com.uthh.edd.unidad1.proyecto;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
- * @author mi pc
+ * autor: Angel Uriel Espinoza Alvarado
  */
 public class FrmReportes extends javax.swing.JFrame {
     
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FrmReportes.class.getName());
+    
+  // Variables globales para guardar los datos recibidos de la taquilla
+    private tdaBoletoCine[] lista;
+    private int totalVentas;
+
+    // Constructor que recibe el arreglo de boletos y la cantidad de ventas registradas
+    public FrmReportes(tdaBoletoCine[] lista, int totalVentas) {
+        initComponents();
+        this.setLocationRelativeTo(null); // Centra la ventana en pantalla
+
+        // Guardamos los datos que nos enviaron desde la taquilla
+        this.lista = lista;
+        this.totalVentas = totalVentas;
+
+        // Llamamos al metodo para que la tabla se cargue al abrir la ventana
+        cargarTabla();
+    }
+
+    // Metodo para llenar la tabla y sumar los totales
+    public void cargarTabla() {
+        // Obtenemos el modelo de la tabla para manipular sus filas
+        DefaultTableModel modelo = (DefaultTableModel) tblVentas.getModel();
+        modelo.setRowCount(0); // Limpia las filas para que no se dupliquen al dar clic en actualizar
+
+        // Variables acumuladoras para los totales inferiores
+        int sumaBoletos = 0;
+        double sumaDinero = 0.0;
+
+        // Ciclo for para recorrer unicamente las ventas realizadas
+        for (int i = 0; i < totalVentas; i++) {
+            tdaBoletoCine b = lista[i];
+
+            // Verificamos si el boleto es VIP usando herencia
+            String esVip;
+            if (b instanceof tdaBoletoVip) {
+                esVip = "Si";
+            } else {
+                esVip = "No";
+            }
+
+            // Acumulamos la cantidad de boletos y el dinero recaudado
+            sumaBoletos = sumaBoletos + b.getCantBoletos();
+            sumaDinero = sumaDinero + b.calcularTotal();
+
+            // Creamos un arreglo para la fila con las 6 columnas
+            Object[] fila = new Object[6];
+            fila[0] = b.getFolio();          // Columna 1: Folio
+            fila[1] = b.getCliente();        // Columna 2: Nombre del cliente
+            fila[2] = b.getPelicula();       // Columna 3: Pelicula
+            fila[3] = b.getCantBoletos();    // Columna 4: Cantidad de boletos
+            fila[4] = esVip;                 // Columna 5: Tipo de sala (VIP o Normal)
+            fila[5] = b.calcularTotal();     // Columna 6: Total cobrado
+
+            // Agregamos la fila a la tabla
+            modelo.addRow(fila);
+        }
+
+        // Mostramos los resultados finales en las etiquetas inferiores
+        lblBoletosVendidos.setText(sumaBoletos + "");
+        lblTotal.setText("$" + sumaDinero);
+    }
 
     /**
      * Creates new form FrmReportes
@@ -18,6 +79,7 @@ public class FrmReportes extends javax.swing.JFrame {
     public FrmReportes() {
         initComponents();
     }
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FrmReportes.class.getName());
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -35,7 +97,6 @@ public class FrmReportes extends javax.swing.JFrame {
         lblBoletosVendidos = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         lblTotal = new javax.swing.JLabel();
-        btnActualizar = new javax.swing.JButton();
         btnCerrar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -66,13 +127,10 @@ public class FrmReportes extends javax.swing.JFrame {
         lblTotal.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         lblTotal.setText("0");
 
-        btnActualizar.setBackground(new java.awt.Color(0, 0, 109));
-        btnActualizar.setForeground(new java.awt.Color(255, 255, 255));
-        btnActualizar.setText("Actualizar reporte");
-
         btnCerrar.setBackground(new java.awt.Color(180, 20, 30));
         btnCerrar.setForeground(java.awt.Color.white);
         btnCerrar.setText("Cerrar ventana");
+        btnCerrar.addActionListener(this::btnCerrarActionPerformed);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -91,13 +149,11 @@ public class FrmReportes extends javax.swing.JFrame {
                                 .addComponent(jLabel1)
                                 .addGap(211, 211, 211))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                         .addComponent(jLabel2)
                                         .addGap(18, 18, 18)
-                                        .addComponent(lblBoletosVendidos, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(btnActualizar))
+                                        .addComponent(lblBoletosVendidos, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE))
                                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(56, 56, 56))))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
@@ -123,8 +179,6 @@ public class FrmReportes extends javax.swing.JFrame {
                             .addComponent(lblTotal))
                         .addContainerGap(47, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnActualizar)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnCerrar)
                         .addContainerGap())))
@@ -132,6 +186,11 @@ public class FrmReportes extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnCerrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCerrarActionPerformed
+        // Cierra unicamente la ventana de reportes sin detener la aplicacion
+        this.dispose();
+    }//GEN-LAST:event_btnCerrarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -159,7 +218,6 @@ public class FrmReportes extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnActualizar;
     private javax.swing.JButton btnCerrar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
