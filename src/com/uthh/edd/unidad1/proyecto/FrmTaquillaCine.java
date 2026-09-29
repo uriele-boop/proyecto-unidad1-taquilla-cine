@@ -148,6 +148,7 @@ public class FrmTaquillaCine extends javax.swing.JFrame {
         btnVerReportes.setBackground(new java.awt.Color(0, 0, 128));
         btnVerReportes.setForeground(new java.awt.Color(255, 255, 255));
         btnVerReportes.setText("Ver reportes");
+        btnVerReportes.addActionListener(this::btnVerReportesActionPerformed);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -364,6 +365,11 @@ public class FrmTaquillaCine extends javax.swing.JFrame {
                 + "Combos palomitas: " + combos + "\n"
                 + "Total a pagar: $" + totalFinal + "\n");
     }//GEN-LAST:event_btnVenderActionPerformed
+
+    private void btnVerReportesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerReportesActionPerformed
+        // Crea y abre la ventana de reportes enviando la lista y el contador actual
+        new FrmReportes(listaBoletos, totalVentas).setVisible(true);
+    }//GEN-LAST:event_btnVerReportesActionPerformed
 
     /**
      * @param args the command line arguments
