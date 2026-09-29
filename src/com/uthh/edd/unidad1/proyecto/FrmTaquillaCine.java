@@ -6,20 +6,49 @@ package com.uthh.edd.unidad1.proyecto;
 
 /**
  *
- * @author mi pc
+ * autor: Angel Uriel Espinoza Alvarado
  */
 public class FrmTaquillaCine extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FrmTaquillaCine.class.getName());
-
-    /**
-     * Creates new form FrmTaquillaCine
-     */
+  // arreglo unidimensional para registrar hasta 100 boletos
+    private tdaBoletoCine[] listaBoletos = new tdaBoletoCine[100];
+    
+    // Contador de ventas registradas
+    private int totalVentas = 0;
+    
     public FrmTaquillaCine() {
         initComponents();
+        this.setLocationRelativeTo(null); // Centra la ventana en la pantalla
+        // Evita que el usuario altere manualmente la clasificacion
+        txtClasificacion.setEditable(false);
         
+        // Asigna la clasificacion inicial segun la primera pelicula
+        actualizarClasificacion();
     }
+// Asigna la clasificacion segun la pelicula seleccionada
+    private void actualizarClasificacion() {
+        String pelicula = String.valueOf(cmbPelicula.getSelectedItem()).trim();
 
+        switch (pelicula) {
+            case "Spiderman":
+            case "Cars 1":
+            case "Toy Story":
+                txtClasificacion.setText("A");
+                break;
+            case "Avengers Doomsday":
+            case "Rapidos y Furiosos":
+                txtClasificacion.setText("B");
+                break;
+            case "La Odisea":
+                txtClasificacion.setText("C");
+                break;
+            default:
+                txtClasificacion.setText("A");
+                break;
+        }
+    }
+   
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -40,7 +69,7 @@ public class FrmTaquillaCine extends javax.swing.JFrame {
         txtCliente = new javax.swing.JTextField();
         cmbPelicula = new javax.swing.JComboBox<>();
         spnCantidad = new javax.swing.JSpinner();
-        jCheckBox1 = new javax.swing.JCheckBox();
+        chkSalaVip = new javax.swing.JCheckBox();
         jLabel9 = new javax.swing.JLabel();
         spnCombo = new javax.swing.JSpinner();
         btnVender = new javax.swing.JButton();
@@ -54,6 +83,7 @@ public class FrmTaquillaCine extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setAutoRequestFocus(false);
+        setBackground(new java.awt.Color(0, 255, 0));
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel1.setText("Sistema de taquillas de cine");
@@ -75,12 +105,14 @@ public class FrmTaquillaCine extends javax.swing.JFrame {
         jLabel7.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel7.setText("Cantidad de boletos: ");
 
-        cmbPelicula.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Cars 1 ", "La Odisea ", "Toy Story ", "Avengers Doomsday ", "Rapidos y Furiosos ", "Spiderman " }));
+        cmbPelicula.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Spiderman ", "Cars 1 ", "La Odisea ", "Toy Story ", "Avengers Doomsday ", "Rapidos y Furiosos ", " " }));
+        cmbPelicula.addActionListener(this::cmbPeliculaActionPerformed);
 
         spnCantidad.setModel(new javax.swing.SpinnerNumberModel(1, 1, 10, 1));
 
-        jCheckBox1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jCheckBox1.setText("Sala VIP");
+        chkSalaVip.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        chkSalaVip.setText("Sala VIP");
+        chkSalaVip.addActionListener(this::chkSalaVipActionPerformed);
 
         jLabel9.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel9.setText("Combos Palomitas");
@@ -92,11 +124,13 @@ public class FrmTaquillaCine extends javax.swing.JFrame {
         btnVender.setForeground(new java.awt.Color(255, 255, 255));
         btnVender.setText("Vender");
         btnVender.setToolTipText("");
+        btnVender.addActionListener(this::btnVenderActionPerformed);
 
         btnCancelar.setBackground(new java.awt.Color(180, 20, 30));
         btnCancelar.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         btnCancelar.setForeground(new java.awt.Color(255, 255, 255));
         btnCancelar.setText("Cancelar");
+        btnCancelar.addActionListener(this::btnCancelarActionPerformed);
 
         txtRecibo.setEditable(false);
         txtRecibo.setBackground(new java.awt.Color(249, 255, 255));
@@ -109,7 +143,7 @@ public class FrmTaquillaCine extends javax.swing.JFrame {
 
         txtClasificacion.setEditable(false);
 
-        spnEdad.setModel(new javax.swing.SpinnerNumberModel(1, 1, 10, 1));
+        spnEdad.setModel(new javax.swing.SpinnerNumberModel(1, 1, 100, 1));
 
         btnVerReportes.setBackground(new java.awt.Color(0, 0, 128));
         btnVerReportes.setForeground(new java.awt.Color(255, 255, 255));
@@ -129,15 +163,11 @@ public class FrmTaquillaCine extends javax.swing.JFrame {
                             .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(spnEdad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(cmbPelicula, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtFolio, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtCliente, javax.swing.GroupLayout.PREFERRED_SIZE, 237, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblClasificacion)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(txtClasificacion, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(txtFolio, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
+                            .addComponent(cmbPelicula, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtCliente)))
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                             .addGap(55, 55, 55)
@@ -145,19 +175,24 @@ public class FrmTaquillaCine extends javax.swing.JFrame {
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btnCancelar, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                            .addComponent(jCheckBox1)
+                            .addComponent(chkSalaVip)
                             .addGap(18, 18, 18)
                             .addComponent(jLabel9)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                             .addComponent(spnCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel7)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(spnCantidad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
                         .addGap(24, 24, 24)
-                        .addComponent(jLabel2)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 79, Short.MAX_VALUE)
+                        .addComponent(jLabel2))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                .addComponent(lblClasificacion)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(txtClasificacion, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jLabel7))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(spnCantidad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 119, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 257, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -202,12 +237,12 @@ public class FrmTaquillaCine extends javax.swing.JFrame {
                                     .addComponent(lblClasificacion)
                                     .addComponent(txtClasificacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(19, 19, 19)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabel7)
-                                    .addComponent(spnCantidad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(spnCantidad, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel7))
                                 .addGap(34, 34, 34)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jCheckBox1)
+                                    .addComponent(chkSalaVip)
                                     .addComponent(jLabel9)
                                     .addComponent(spnCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(33, 33, 33)
@@ -228,6 +263,107 @@ public class FrmTaquillaCine extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void chkSalaVipActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkSalaVipActionPerformed
+         // Habilita o deshabilita el spinner de combos segun el estado del checkbox
+        if (chkSalaVip.isSelected()) {
+            spnCombo.setEnabled(true);
+        } else {
+            spnCombo.setValue(0); // Reinicia los combos a cero si se desmarca
+        }
+    }//GEN-LAST:event_chkSalaVipActionPerformed
+
+    private void cmbPeliculaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbPeliculaActionPerformed
+        actualizarClasificacion();
+    }//GEN-LAST:event_cmbPeliculaActionPerformed
+
+    private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
+        // Limpia las cajas de texto y el area de recibo
+        txtFolio.setText("");
+        txtCliente.setText("");
+        txtRecibo.setText("");
+        
+        // Restablece los spinners a sus valores iniciales
+        spnEdad.setValue(1);
+        spnCantidad.setValue(1);
+        spnCombo.setValue(0);
+        
+        // Desmarca la casilla VIP
+        chkSalaVip.setSelected(false);
+        
+        // Regresa el combo a la primera pelicula y actualiza su clasificacion
+        cmbPelicula.setSelectedIndex(0);
+        actualizarClasificacion();
+        
+        // Coloca el foco en el primer campo de captura
+        txtFolio.requestFocus();        
+    }//GEN-LAST:event_btnCancelarActionPerformed
+
+    private void btnVenderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVenderActionPerformed
+       // Obtener datos de la pantalla
+        String folio = txtFolio.getText();
+        String cliente = txtCliente.getText();
+        int edad = (int) spnEdad.getValue();
+        int cantidad = (int) spnCantidad.getValue();
+        int combos = (int) spnCombo.getValue();
+        String pelicula = cmbPelicula.getSelectedItem().toString();
+        String clasificacion = txtClasificacion.getText();
+
+        // Validar la venta de acuerdo a su edad
+        if (clasificacion.equals("B") && edad < 12) {
+            txtRecibo.setText("No se puede vender el boleto");
+            return;
+        }
+        if (clasificacion.equals("C") && edad < 18) {
+            txtRecibo.setText("No se puede vender el boleto");
+            return;
+        }
+
+        double precioBase = 70.0;
+        double cargoVip = 50.0;
+        double costoCombo = 85.0;
+        
+        tdaBoletoCine nuevoBoleto;
+        String tipoSala;
+        double precioBoleto;
+
+        if (chkSalaVip.isSelected()) {
+            tipoSala = "VIP";
+            // Para mostrar $120.0 en el ticket:
+            precioBoleto = precioBase + cargoVip; 
+            // Al objeto le pasamos el precio base (70.0) y el extra (50.0):
+            nuevoBoleto = new tdaBoletoVip(folio, cliente, edad, pelicula, cantidad, precioBase, cargoVip);
+        } else {
+            tipoSala = "Tradicional";
+            precioBoleto = precioBase; // Muestra $70.0
+            nuevoBoleto = new tdaBoletoCine(folio, cliente, edad, pelicula, cantidad, precioBase);
+        }
+
+        // Guardar en el arreglo y contar venta
+        listaBoletos[totalVentas] = nuevoBoleto;
+        totalVentas++;
+        
+        // Obtenemos el descuento aplicado mediante el metodo recursivo
+        double descuento = nuevoBoleto.calcularDescuentoRecursivo(cantidad);
+
+        // Calcular el total a pagar
+        double totalFinal = nuevoBoleto.calcularTotal() + (combos * costoCombo);
+
+        // Imprimir ticket detallado
+        txtRecibo.setText(" TICKET DE VENTA \n"
+                + "Folio: " + folio + "\n"
+                + "Cliente: " + cliente + "\n"
+                + "Edad: " + edad+"\n"
+                + "Pelicula: " + pelicula + "\n"
+                + "Clasificacion: " + clasificacion + "\n"
+                + "Tipo de Sala: " + tipoSala + "\n"
+                + "Precio boleto: $" + precioBoleto + "\n"
+                + "Cantidad boletos: " + cantidad + "\n"
+                + "Descuento aplicado: "+ descuento+"\n"      
+                + "Precio combo: $" + costoCombo + "\n"
+                + "Combos palomitas: " + combos + "\n"
+                + "Total a pagar: $" + totalFinal + "\n");
+    }//GEN-LAST:event_btnVenderActionPerformed
 
     /**
      * @param args the command line arguments
@@ -258,8 +394,8 @@ public class FrmTaquillaCine extends javax.swing.JFrame {
     private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnVender;
     private javax.swing.JButton btnVerReportes;
+    private javax.swing.JCheckBox chkSalaVip;
     private javax.swing.JComboBox<String> cmbPelicula;
-    private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
